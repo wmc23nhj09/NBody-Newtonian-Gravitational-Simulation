@@ -15,6 +15,7 @@
 * Scalable size
 * Screen Scaling
 * Time Scaling
+* Angular Momentum
 * Barnes hut algorithm
 * etc.
 
