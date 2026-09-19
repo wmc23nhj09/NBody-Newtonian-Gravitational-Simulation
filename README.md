@@ -8,12 +8,12 @@
 * Gravity
 * Block Spawning~
 * Collision Handeling~
+* Screen Scaling~
 
 # Future Features
 * Energy Conservation
 * Block Property Changing
 * Scalable size
-* Screen Scaling
 * Time Scaling
 * Angular Momentum
 * Barnes hut algorithm
