@@ -11,5 +11,5 @@ public:
 
 	Renderer(SDL_Renderer* renderer);
 
-	void Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks);
+	void Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldSize[2]);
 };

@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="NNGS/NNGS.vcxproj" Id="104f89d9-f69a-494c-877a-fc60b743dc5c" />
+</Solution>

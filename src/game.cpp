@@ -11,20 +11,28 @@ Game::Game() :
 	e(),
 	GravitationalConstant(6.67433e-11),
 	Blocks{
-		{ {1e24, {0, 0}, {0, 0}}, {{100, 100, 20, 20}}}
+		{ {1e16, {0, 0}, {0, 0}}, {{100, 100, 20, 20}}}
 	},
 	physics(),
 	blocksManager(),
 	dt(),
-	MetersPerPixel(1e2),
-	SimulationScale(10),
-	mouse{1, 1, 1, 1}
+	SimulationScale(1),
+	mouse{1, 1, 1, 1},
+	WorldSize{}
 {
 }
 
 void Game::run() {
 	Uint64 framesbefore = SDL_GetPerformanceCounter();
 	while (running) {
+		SDL_GetWindowSizeInPixels(window.window, &window.WindowWidth, &window.WindowHeight);
+
+		WorldSize[0] = (double)window.WindowWidth;
+		WorldSize[1] = (double)window.WindowHeight;
+
+		double WorldCenter[2] = { WorldSize[0] / 2, WorldSize[1] / 2 };
+
+
 		Uint64 framesnow = SDL_GetPerformanceCounter();
 
 		dt = ((double)(framesnow - framesbefore) / SDL_GetPerformanceFrequency());
@@ -37,13 +45,25 @@ void Game::run() {
 			}
 
 			if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-				blocksManager.CreateNewPhysicsObject(Blocks, mouse);
+				blocksManager.CreateNewPhysicsObject(Blocks, mouse, SimulationScale, WorldCenter);
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_MINUS) {
+				if (SimulationScale + 1 <= 1e6) {
+					SimulationScale += 1;
+				}
+			}
+
+			else if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_EQUALS) {
+				if (SimulationScale - 1 >= 1) {
+					SimulationScale -= 1;
+				}
 			}
 
 		}
 
-		renderer.Draw(window.renderer, Blocks);
-		physics.ApplyGravity(Blocks, GravitationalConstant, dt, MetersPerPixel, SimulationScale);
+		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldSize);
+		physics.ApplyGravity(Blocks, GravitationalConstant, dt, SimulationScale);
 
 		physics.Collision(Blocks);
 		SDL_RenderPresent(window.renderer);

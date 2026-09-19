@@ -22,7 +22,7 @@ private:
 	Physics physics;
 	BlocksManager blocksManager;
 	double dt;
-	double MetersPerPixel;
 	double SimulationScale;
 	SDL_FRect mouse;
+	double WorldSize[2];
 };

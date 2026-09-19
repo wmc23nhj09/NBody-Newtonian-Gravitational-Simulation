@@ -20,5 +20,5 @@ struct CombinedBlock {
 
 class BlocksManager {
 public:
-	void CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, SDL_FRect& mouse);
+	void CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, SDL_FRect& mouse, double SimulationScale, double WorldCenter[2]);
 };

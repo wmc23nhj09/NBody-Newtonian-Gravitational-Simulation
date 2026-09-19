@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 
-void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant,double dt, double MetersPerPixel, double SimulationScale){
+void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant,double dt, double MetersPerPixel){
 
     for (auto& block : Blocks) {
         block.physics.new_accel[0] = 0.0;
@@ -23,9 +23,7 @@ void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double Gravitation
                 continue;
             }
 
-            double EffectiveMetersPerPixel = MetersPerPixel * SimulationScale;
-
-            double r = pixel_distance * EffectiveMetersPerPixel;
+            double r = pixel_distance * MetersPerPixel;
 
             double force = GravitationalConstant * (Blocks[i].physics.mass * Blocks[j].physics.mass) / (r * r);
 
