@@ -5,13 +5,13 @@
 * This program was coded in C++, with SDL3 used as the visual help.
 
 # Features
-* None as of right now
+* Gravity
+* Block Spawning~
+* Collision Handeling~
 
 # Future Features
-* Gravity
 * Energy Conservation
-* Block Spawning
-* Collision Handeling
+* Block Property Changing
 * Scalable size
 * Screen Scaling
 * Time Scaling
@@ -20,4 +20,6 @@
 * etc.
 
 # Known Limitations
-* Well, either everything, or nothing, depending on how you look at it..
+* Doesn't allow interchangable sizes, or block properties
+* Unscalable, so objects often fly out of screen
+* Cannot delete objects
