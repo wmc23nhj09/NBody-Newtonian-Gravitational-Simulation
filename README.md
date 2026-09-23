@@ -6,20 +6,22 @@
 
 # Features
 * Gravity
-* Block Spawning~
+* Block Spawning
 * Collision Handeling~
-* Screen Scaling~
+* Screen Scaling
+* Block Property Changing~
+* Scalable size
+* Pre-spawning trajectory path
 
 # Future Features
 * Energy Conservation
-* Block Property Changing
-* Scalable size
 * Time Scaling
 * Angular Momentum
 * Barnes hut algorithm
 * etc.
 
 # Known Limitations
-* Doesn't allow interchangable sizes, or block properties
-* Unscalable, so objects often fly out of screen
-* Cannot delete objects
+* Cannot delete objects individiually
+* Limited block property changes
+* Same block size regardless of mass
+* Pre-spawn trajectory path often bugs out as the path of the object is suspected to go through another
