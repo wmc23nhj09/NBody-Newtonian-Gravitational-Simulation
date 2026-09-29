@@ -12,6 +12,9 @@
 * Block Property Changing~
 * Scalable size
 * Pre-spawning trajectory path
+* Automatic orbit creator~
+* Time Pause
+* Interchangeable pixel to meter ratio
 
 # Future Features
 * Energy Conservation
@@ -22,6 +25,5 @@
 
 # Known Limitations
 * Cannot delete objects individiually
-* Limited block property changes
 * Same block size regardless of mass
-* Pre-spawn trajectory path often bugs out as the path of the object is suspected to go through another
+* Orbit Creator only works on 1 non-moving object, and cannot be used after moving the screen via scaling
