@@ -13,12 +13,18 @@ struct RenderingState {
 	SDL_FRect rect;
 };
 
+struct InteractionState {
+	bool clicked{ false };
+};
+
 struct CombinedBlock {
 	PhysicsState physics;
 	RenderingState rendering;
+	InteractionState interaction;
 };
 
 class BlocksManager {
 public:
 	void CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, SDL_FRect& mouse, double SimulationScale, double WorldCenter[2], double WorldOffset[2], double InitialVel[2], double mass, double rho);
+	void GetHeldState(std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double WorldOffset[2], double WorldCenter[2], double SimulationScale);
 };

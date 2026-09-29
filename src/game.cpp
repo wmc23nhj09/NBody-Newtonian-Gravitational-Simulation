@@ -17,13 +17,15 @@ Game::Game() :
 	Blocks{
 	},
 	NewInstance{},
-	CreationBlockMass{ 15 },
+	SelectedBlock{nullptr},
+	CreationBlockMass{ 1 },
 	physics(),
 	blocksManager(),
 	ui(),
 	window_flags(),
 	dt(),
 	SimulationScale(1),
+	MetersPerPixel(0),
 	rho(1),
 	mouse{ 1, 1, 1, 1 },
 	WorldSize{},
@@ -34,6 +36,9 @@ Game::Game() :
 	CreationDragging(false),
 	ShowInteractionLines(false),
 	BlockPropertyCreationMenu(false),
+	SimulationSettings(false),
+	SimPlay(true),
+	OrbitPlace(false),
 	Creation(false),
 	Path{},
 	CreationX(),
@@ -75,16 +80,44 @@ void Game::run() {
 
 			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_Q) {
 				Creation = !Creation;
+				OrbitPlace = false;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_B) {
+				BlockPropertyCreationMenu = !BlockPropertyCreationMenu;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE) {
+				SimPlay = !SimPlay;
 			}
 
 			if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 
-				if (e.button.button == SDL_BUTTON_LEFT && Creation) {
-					if (tempMousepos[0] == -1) {
-						tempMousepos[0] = mouse.x;
-						tempMousepos[1] = mouse.y;
+
+				if (e.button.button == SDL_BUTTON_LEFT) {
+
+					if (Creation) {
+						if (tempMousepos[0] == -1) {
+							tempMousepos[0] = mouse.x;
+							tempMousepos[1] = mouse.y;
+						}
+						CreationDragging = true;
 					}
-					CreationDragging = true;
+					else if (OrbitPlace && SelectedBlock != nullptr) {
+						CombinedBlock temp = physics.OrbitPlaceCalculation(SelectedBlock, Blocks, mouse, GravitationalConstant, SimulationScale, MetersPerPixel, CreationBlockMass, dt, WorldOffset, WorldCenter);
+
+						SelectedBlock = nullptr;
+						blocksManager.CreateNewPhysicsObject(Blocks, mouse, SimulationScale, WorldCenter, WorldOffset, temp.physics.velocity, CreationBlockMass, rho);
+					}
+					else {
+						blocksManager.GetHeldState(Blocks, mouse, WorldOffset, WorldCenter, SimulationScale);
+						for (auto& b : Blocks){
+							if (b.interaction.clicked) {
+								SelectedBlock = &b;
+								break;
+							}
+						}
+					}
 
 				}
 
@@ -117,14 +150,13 @@ void Game::run() {
 				if (e.button.button == SDL_BUTTON_RIGHT) {
 					tempMousepos[0] = -1;
 					Dragging = false;
+					SelectedBlock = nullptr;
 
 					PrevWorldOffset[0] = WorldOffset[0];
 					PrevWorldOffset[1] = WorldOffset[1];
 				}
 				else if (e.button.button == SDL_BUTTON_LEFT && Creation){
 					SDL_FRect TempRect{ tempMousepos[0], tempMousepos[1], mouse.w, mouse.h };
-
-					std::cout << InitialVel[0] << ", " << InitialVel[1] << '\n';
 
 					blocksManager.CreateNewPhysicsObject(Blocks, TempRect, SimulationScale, WorldCenter, WorldOffset, InitialVel, CreationBlockMass, rho);
 
@@ -152,6 +184,11 @@ void Game::run() {
 				Blocks.clear();
 			}
 
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_O) {
+				OrbitPlace = !OrbitPlace;
+				Creation = false;
+			}
+
 		}
 
 		if (Dragging) {
@@ -176,15 +213,36 @@ void Game::run() {
 
 			SDL_FRect rect = {tempMousepos[0], tempMousepos[1], 20, 20};
 
-			Path = physics.GetNewBlockInstancePath(Blocks, GravitationalConstant, SimulationScale, InitialVel, CreationBlockMass, CreationX, CreationY, rect, WorldCenter, WorldOffset, SimulationScale, NewInstance, dt);
+			Path = physics.GetNewBlockInstancePath(Blocks, GravitationalConstant, SimulationScale, InitialVel, CreationBlockMass, CreationX, CreationY, rect, WorldCenter, WorldOffset, MetersPerPixel, NewInstance, dt);
 		}
 
-		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldCenter, WorldOffset, ShowInteractionLines, Path);
-		physics.ApplyGravity(Blocks, GravitationalConstant, dt, SimulationScale);
+		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldCenter, WorldOffset, ShowInteractionLines, Path, BlockPropertyCreationMenu, Creation, OrbitPlace);
+
+		if (SimPlay) {
+			physics.ApplyGravity(Blocks, GravitationalConstant, dt, SimulationScale, MetersPerPixel);
+		}
 
 		physics.Collision(Blocks);
 
-		ui.DrawUI(window.renderer, window_flags, BlockPropertyCreationMenu, window.WindowWidth, window.WindowHeight, CreationBlockMass, (float&)rho);
+		//std::cout << Blocks.size() << '\n';
+
+		int count = 0;
+
+		/*if (SelectedBlock == nullptr) {
+			std::cout << "NULLPTR" << '\n';
+		}
+		else {
+			for (auto& b : Blocks) {
+				if (SelectedBlock == &b) {
+					std::cout << count << '\n';
+				}
+				count += 1;
+			}
+		}*/
+
+		// CANT SPAWN BLOCKS VIA ORBIT VEL ON OFFSET SCALE
+
+		ui.DrawUI(window.renderer, window_flags, BlockPropertyCreationMenu, SimulationSettings, window.WindowWidth, window.WindowHeight, CreationBlockMass, (float&)rho, MetersPerPixel);
 		SDL_RenderPresent(window.renderer);
 
 		framesbefore = framesnow;

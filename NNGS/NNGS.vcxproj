@@ -111,7 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)/;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\Physics Sims\Nbody-Newtonian-Gravitational-System\NNGS\Third-Party;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\Physics Sims\Nbody-Newtonian-Gravitational-System\NNGS\include;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\SDL3\include;$(SolutionDir)/Third-Party/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\Physics Sims\N-Body Family\Nbody-Newtonian-Gravitational-System\NNGS\Third-Party;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\Physics Sims\N-Body Family\Nbody-Newtonian-Gravitational-System\NNGS\include;C:\Users\wmc10\Desktop\Main Code Folder\Software\C++\SDL3\include;$(SolutionDir)/Third-Party/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

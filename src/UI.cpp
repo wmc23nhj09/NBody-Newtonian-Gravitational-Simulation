@@ -15,7 +15,7 @@ void UI::SetFlags(ImGuiWindowFlags& window_flags) {
 	window_flags |= ImGuiSliderFlags_NoInput;		  // Stops Tab / Ctrl+Click abuse on sliders
 };
 
-void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, float WINWIDTH, float WINHEIGHT, double& mass, float& rho) {
+void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, float WINWIDTH, float WINHEIGHT, double& mass, float& rho, double& MetersPerPixel) {
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
@@ -26,20 +26,34 @@ void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& Bl
 
 	ImGui::Begin("My Window", nullptr, window_flags);
 
-	if (ImGui::Button("Block Creation Menu", ImVec2(120, 40))) {
+	ImGui::SetCursorPos(ImVec2(0, .6639 * WINHEIGHT));
+
+	if (ImGui::Button(" Block \n Creation \n Menu", ImVec2(120, WINHEIGHT - .6639 * WINHEIGHT))) {
 		BlockPropertyCreationMenu = !BlockPropertyCreationMenu;
-		std::cout << "Button clicked: "
-			<< BlockPropertyCreationMenu
-			<< std::endl;
 	};
 
 	if (BlockPropertyCreationMenu) {
 
-		double minExponent = 15;
+		double minExponent = 1;
 		double maxExponent = 30;
-		ImGui::SetCursorPos(ImVec2(0.02f * WINWIDTH, 0.5f * WINHEIGHT));
-		ImGui::PushItemWidth(0.865f * WINWIDTH);
-		ImGui::SliderScalar("Mass", ImGuiDataType_Double, &mass, &minExponent, &maxExponent, "10^%.2f Kg");
+		ImGui::SetCursorPos(ImVec2(120, 0.67f * WINHEIGHT));
+		ImGui::PushItemWidth(0.66f * WINWIDTH);
+		ImGui::SliderScalar("Mass", ImGuiDataType_Double, &mass, &minExponent, &maxExponent, "Mass: 10^%.2f Kg");
+
+	}
+
+	ImGui::SetCursorPos(ImVec2(WINWIDTH - 160, 0));
+
+	if (ImGui::Button(" Simulation \n Settings ", ImVec2(120, WINHEIGHT - .6639 * WINHEIGHT))) {
+		SimulationSettings = !SimulationSettings;
+	};
+
+	if (SimulationSettings) {
+		double minVal = 0;
+		double maxVal = 10;
+		ImGui::SetCursorPos(ImVec2(0.67f * WINWIDTH, 120));
+		ImGui::PushItemWidth(0.15 * WINWIDTH);
+		ImGui::SliderScalar("MetersPerPixel", ImGuiDataType_Double, &MetersPerPixel, &minVal, &maxVal, "10^%.0f M/px");
 	}
 
 	ImGui::End();

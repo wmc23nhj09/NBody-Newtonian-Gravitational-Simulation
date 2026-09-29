@@ -6,5 +6,5 @@ class UI {
 public:
 	void SetFlags(ImGuiWindowFlags& window_flags);
 
-	void DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, float WINWIDTH, float WINHEIGHT, double& mass, float& rho);
+	void DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, float WINWIDTH, float WINHEIGHT, double& mass, float& rho, double& MetersPerPixel);
 };

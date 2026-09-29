@@ -2,9 +2,11 @@
 #include "blocks.h"
 #include <vector>
 #include <iostream>
+#include <numbers>
 #include <array>
 
-void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant,double dt, double MetersPerPixel){
+void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant,double dt, double SimulationScale, double MetersPerPixel){
+    MetersPerPixel = pow(10, MetersPerPixel);
 
     for (auto& block : Blocks) {
         block.physics.new_accel[0] = 0.0;
@@ -24,7 +26,7 @@ void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double Gravitation
                 continue;
             }
 
-            double r = pixel_distance;
+            double r = (pixel_distance * MetersPerPixel);
 
             double force = GravitationalConstant * (Blocks[i].physics.mass * Blocks[j].physics.mass) / (r * r);
 
@@ -62,13 +64,14 @@ void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double Gravitation
 
         block.physics.velocity[1] += block.physics.new_accel[1] * dt;
 
-        block.rendering.rect.x += block.physics.velocity[0] * dt / MetersPerPixel;
+        block.rendering.rect.x += block.physics.velocity[0] * dt / SimulationScale;
 
-        block.rendering.rect.y += block.physics.velocity[1] * dt / MetersPerPixel;
+        block.rendering.rect.y += block.physics.velocity[1] * dt / SimulationScale;
     }
 }
 
-std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<CombinedBlock>& Blocks, double GravitationalConstant, double MetersPerPixel, double InitialVel[2], double mass, double& CreationX, double& CreationY, SDL_FRect mouse, double WorldCenter[2], double WorldOffset[2], double SimulationScale, CombinedBlock& NewInstance, double dt) {
+std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<CombinedBlock>& Blocks, double GravitationalConstant, double SimulationScale, double InitialVel[2], double mass, double& CreationX, double& CreationY, SDL_FRect mouse, double WorldCenter[2], double WorldOffset[2], double MetersPerPixel, CombinedBlock& NewInstance, double dt) {
+    MetersPerPixel = pow(10, MetersPerPixel);
     std::vector<std::array<double, 2>> Path;
 
     double LastPathX = 0;
@@ -119,7 +122,7 @@ std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<
 
             double r = pixel_distance;
 
-            double force = GravitationalConstant * (Blocks[i].physics.mass * NewInstance.physics.mass) / (r * r);
+            double force = GravitationalConstant * (Blocks[i].physics.mass * NewInstance.physics.mass) / (r * r * MetersPerPixel);
 
             double accel_j = force / NewInstance.physics.mass;
 
@@ -131,8 +134,8 @@ std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<
         PredictedVel[0] += PredictedAcceleration[0] * dt;
         PredictedVel[1] += PredictedAcceleration[1] * dt;
 
-        PredictedX += PredictedVel[0] * dt / MetersPerPixel;
-        PredictedY += PredictedVel[1] * dt / MetersPerPixel;
+        PredictedX += PredictedVel[0] * dt / SimulationScale;
+        PredictedY += PredictedVel[1] * dt / SimulationScale;
 
         Path.push_back({
                 PredictedX,
@@ -160,4 +163,35 @@ void Physics::Collision(std::vector<CombinedBlock>& Blocks) {
 			i--;
 		}
 	}
+}
+
+CombinedBlock Physics::OrbitPlaceCalculation(CombinedBlock* SelectedBlock, std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double GravitationalConstant, double SimulationScale, double MetersPerPixelExpo, double mass, double dt, double WorldOffset[2], double WorldCenter[2]) {
+
+    CombinedBlock temp{ {pow(10, mass), {0, 0}, {0, 0} }, { {WorldCenter[0] + ((mouse.x - WorldCenter[0]) / SimulationScale), WorldCenter[1] + ((mouse.y - WorldCenter[1]) / SimulationScale), 20, 20}}, {false}};
+
+    
+    double dx = temp.rendering.rect.x - SelectedBlock->rendering.rect.x;
+    double dy = temp.rendering.rect.y - SelectedBlock->rendering.rect.y;
+
+    double pixel_dist = std::sqrt(dx * dx + dy * dy);
+
+    double MetersPerPixel = pow(10, MetersPerPixelExpo);
+
+    double r = (pixel_dist * MetersPerPixel);
+
+    double acceleration = (GravitationalConstant * SelectedBlock->physics.mass) / (r * r);
+
+    double vel = sqrt(acceleration * r) / SimulationScale;
+
+    double angle = atan2(dy, dx);
+
+    double perpindicularAngle = angle - (std::numbers::pi / 2.0);
+
+    double x_vel = cos(perpindicularAngle) * vel;
+    double y_vel = sin(perpindicularAngle) * vel;
+
+    temp.physics.velocity[0] = x_vel;
+    temp.physics.velocity[1] = y_vel;
+
+    return temp;
 }

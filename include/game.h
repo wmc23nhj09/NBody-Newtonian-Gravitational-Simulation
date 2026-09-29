@@ -23,6 +23,7 @@ private:
 	const double GravitationalConstant;
 	std::vector<CombinedBlock> Blocks;
 	CombinedBlock NewInstance;
+	CombinedBlock* SelectedBlock;
 	double CreationBlockMass;
 	Physics physics;
 	BlocksManager blocksManager;
@@ -30,6 +31,7 @@ private:
 	ImGuiWindowFlags window_flags;
 	double dt;
 	double SimulationScale;
+	double MetersPerPixel;
 	double rho;
 	SDL_FRect mouse;
 	double WorldSize[2];
@@ -40,6 +42,9 @@ private:
 	bool CreationDragging;
 	bool ShowInteractionLines;
 	bool BlockPropertyCreationMenu;
+	bool SimulationSettings;
+	bool SimPlay;
+	bool OrbitPlace;
 	bool Creation;
 	std::vector<std::array<double, 2>> Path;
 	double CreationX;
