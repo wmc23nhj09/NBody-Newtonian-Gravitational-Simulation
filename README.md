@@ -13,12 +13,11 @@
 * Scalable size
 * Pre-spawning trajectory path
 * Automatic orbit creator~
-* Time Pause
+* Time Control
 * Interchangeable pixel to meter ratio
 
 # Future Features
 * Energy Conservation
-* Time Scaling
 * Angular Momentum
 * Barnes hut algorithm
 * etc.
@@ -26,4 +25,4 @@
 # Known Limitations
 * Cannot delete objects individiually
 * Same block size regardless of mass
-* Orbit Creator only works on 1 non-moving object, and cannot be used after moving the screen via scaling
+* Orbit Creator only takes in to account itself, and one selected object, and does not take into account movement of the selected object.
