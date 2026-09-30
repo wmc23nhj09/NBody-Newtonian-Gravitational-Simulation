@@ -224,24 +224,6 @@ void Game::run() {
 
 		physics.Collision(Blocks);
 
-		//std::cout << Blocks.size() << '\n';
-
-		int count = 0;
-
-		/*if (SelectedBlock == nullptr) {
-			std::cout << "NULLPTR" << '\n';
-		}
-		else {
-			for (auto& b : Blocks) {
-				if (SelectedBlock == &b) {
-					std::cout << count << '\n';
-				}
-				count += 1;
-			}
-		}*/
-
-		// CANT SPAWN BLOCKS VIA ORBIT VEL ON OFFSET SCALE
-
 		ui.DrawUI(window.renderer, window_flags, BlockPropertyCreationMenu, SimulationSettings, window.WindowWidth, window.WindowHeight, CreationBlockMass, (float&)rho, MetersPerPixel);
 		SDL_RenderPresent(window.renderer);
 

@@ -4,8 +4,7 @@
 #include <iostream>
 
 void BlocksManager::CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, SDL_FRect& mouse, double SimulationScale, double WorldCenter[2], double WorldOffset[2], double InitialVel[2], double mass, double rho) {
-	//float CreationX = WorldCenter[0] + (mouse.x - WorldCenter[0]) / SimulationScale;
-	//float CreationY = WorldCenter[1] + (mouse.y - WorldCenter[1]) / SimulationScale;
+	//PROVEN
 
 	float CreationX = (mouse.x - WorldCenter[0]) * SimulationScale + WorldCenter[0];
 	float CreationY = (mouse.y - WorldCenter[1]) * SimulationScale + WorldCenter[1];
@@ -20,18 +19,24 @@ void BlocksManager::CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, S
 }
 
 void BlocksManager::GetHeldState(std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double WorldOffset[2], double WorldCenter[2], double SimulationScale) {
-	double ChangedX = (WorldCenter[0] + ((mouse.x - WorldCenter[0]) / SimulationScale)) - (WorldOffset[0] / SimulationScale);
-	double ChangedY = (WorldCenter[1] + ((mouse.y - WorldCenter[1]) / SimulationScale)) - (WorldOffset[1] / SimulationScale);
+	//PROVEN
 
-	std::cout << ChangedX << ", " << ChangedY << '\n';
+	double ChangedX = (mouse.x - WorldCenter[0]) * SimulationScale + WorldCenter[0] - WorldOffset[0];
+	double ChangedY = (mouse.y - WorldCenter[1]) * SimulationScale + WorldCenter[1] - WorldOffset[1];
+
+
 	for (auto& b : Blocks) {
-		double BlockChangedX = (WorldCenter[0] + ((b.rendering.rect.x - WorldCenter[0]) / SimulationScale)) - (WorldOffset[0] / SimulationScale);
-		double BlockChangedY = (WorldCenter[1] + ((b.rendering.rect.y - WorldCenter[1]) / SimulationScale)) - (WorldOffset[1] / SimulationScale);
-		std::cout << BlockChangedX << ", " << BlockChangedY << '\n';
+
+		double BlockChangedX = (b.rendering.rect.x - WorldCenter[0]) + WorldCenter[0];
+		double BlockChangedY = (b.rendering.rect.y - WorldCenter[1]) + WorldCenter[1];
+
 		b.interaction.clicked = false;
+
 		if (ChangedX < BlockChangedX + b.rendering.rect.w && ChangedX + mouse.w > BlockChangedX && ChangedY < BlockChangedY + b.rendering.rect.h && ChangedY + mouse.h > BlockChangedY) {
+
 			b.interaction.clicked = true;
 			break;
+
 		}
 	}
 }
