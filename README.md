@@ -25,4 +25,4 @@
 # Known Limitations
 * Cannot delete objects individiually
 * Same block size regardless of mass
-* Orbit Creator only takes in to account itself, and one selected object, and does not take into account movement of the selected object.
+* Orbit Creator only takes in to account itself, and one selected object.
