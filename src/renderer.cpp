@@ -8,7 +8,7 @@ Renderer::Renderer(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 };
 
-void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace) {
+void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines,std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime) {
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	SDL_RenderClear(renderer);
@@ -16,6 +16,27 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 
 	for (int i = 0; i < Blocks.size(); i++) {
+
+		if (SelectedBlock != nullptr || ShowAllOrbitLines) {
+
+			double MaxTrailTimer = 2;
+
+			for (int TrailKeep = 1; TrailKeep < Blocks[i].rendering.trails.size(); TrailKeep++) {
+
+				const auto& BlockTrails = Blocks[i].rendering.trails;
+
+				if (abs(BlockTrails[TrailKeep].time - SimTime) < MaxTrailTimer) {
+
+					float x1 = (WorldCenter[0] + ((BlockTrails[TrailKeep - 1].x - WorldCenter[0]) / SimulationScale)) + (WorldOffset[0] / SimulationScale);
+					float y1 = (WorldCenter[1] + ((BlockTrails[TrailKeep - 1].y - WorldCenter[1]) / SimulationScale)) + (WorldOffset[1] / SimulationScale);
+
+					float x2 = (WorldCenter[0] + ((BlockTrails[TrailKeep].x - WorldCenter[0]) / SimulationScale)) + (WorldOffset[0] / SimulationScale);
+					float y2 = (WorldCenter[1] + ((BlockTrails[TrailKeep].y - WorldCenter[1]) / SimulationScale)) + (WorldOffset[1] / SimulationScale);
+
+					SDL_RenderLine(renderer, x1, y1, x2, y2);
+				}
+			}
+		}
 
 		if (Blocks[i].rendering.rect.w / SimulationScale > 1 && Blocks[i].rendering.rect.h / SimulationScale > 1) {
 

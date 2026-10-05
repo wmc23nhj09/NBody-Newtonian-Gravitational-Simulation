@@ -2,6 +2,7 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 #include <imgui.h>
+#include <string>
 #include <iostream>
 
 void UI::SetFlags(ImGuiWindowFlags& window_flags) {
@@ -15,7 +16,7 @@ void UI::SetFlags(ImGuiWindowFlags& window_flags) {
 	window_flags |= ImGuiSliderFlags_NoInput;		  // Stops Tab / Ctrl+Click abuse on sliders
 };
 
-void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, float WINWIDTH, float WINHEIGHT, double& mass, float& rho, double& MetersPerPixel) {
+void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, float WINWIDTH, float WINHEIGHT, double& mass, double& massCoefficient,float& rho, double& MetersPerPixel) {
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
@@ -33,12 +34,19 @@ void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& Bl
 	};
 
 	if (BlockPropertyCreationMenu) {
+		double minCoefficient = 1;
+		double maxCoefficient = 10;
+		ImGui::SetCursorPos(ImVec2(120, 0.67f * WINHEIGHT));
+		ImGui::PushItemWidth(0.66f * WINWIDTH);
+		ImGui::SliderScalar("Mass Coefficient", ImGuiDataType_Double, &massCoefficient, &minCoefficient, &maxCoefficient, " %.2f");
+		
 
 		double minExponent = 1;
 		double maxExponent = 30;
-		ImGui::SetCursorPos(ImVec2(120, 0.67f * WINHEIGHT));
+		ImGui::NewLine();
 		ImGui::PushItemWidth(0.66f * WINWIDTH);
-		ImGui::SliderScalar("Mass", ImGuiDataType_Double, &mass, &minExponent, &maxExponent, "Mass: 10^%.2f Kg");
+		std::string text = "Mass: " + std::to_string(massCoefficient) + "^%.2f kg";
+		ImGui::SliderScalar("Mass Exponent", ImGuiDataType_Double, &mass, &minExponent, &maxExponent, text.c_str());
 
 	}
 

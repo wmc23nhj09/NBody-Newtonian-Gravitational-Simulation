@@ -5,14 +5,9 @@
 #include <numbers>
 #include <array>
 
-void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant,double dt, double SimulationScale, double MetersPerPixel){
+void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double GravitationalConstant, double dt, double SimulationScale, double MetersPerPixel){
     //PROVEN
     MetersPerPixel = pow(10, MetersPerPixel);
-
-    double max = 0;
-    double min = 1e10;
-
-    double maxforce = 0;
 
     for (auto& block : Blocks) {
         block.physics.new_accel[0] = 0.0;
@@ -34,16 +29,7 @@ void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double Gravitation
 
             double r = (pixel_distance * MetersPerPixel);
 
-            if (max < r) {
-                max = r;
-            }
-
-            if (min > r) {
-                min = r;
-            }
-
             double force = GravitationalConstant * (Blocks[i].physics.mass * Blocks[j].physics.mass) / (r * r);
-
 
             double accel_i = force / Blocks[i].physics.mass;
 
@@ -54,36 +40,17 @@ void Physics::ApplyGravity(std::vector<CombinedBlock>& Blocks,double Gravitation
 
             Blocks[j].physics.new_accel[0] -= accel_j * (dx / pixel_distance);
             Blocks[j].physics.new_accel[1] -= accel_j * (dy / pixel_distance);
-
-            if (force > maxforce) {
-                maxforce = force;
-            }
-
-            /*std::cout <<
-               "Object I: \n"
-               << "    Acceleration (x, y) : " << Blocks[i].physics.new_accel[0] << ", " << Blocks[i].physics.new_accel[1] << '\n'
-               << "    Velocity (x, y): " << Blocks[i].physics.velocity[0] << ", " << Blocks[i].physics.velocity[1] << '\n'
-               << "    Mass: " << Blocks[i].physics.mass << '\n'
-
-               <<
-
-               "Object J: \n"
-               << "    Acceleration (x, y) : " << Blocks[j].physics.new_accel[0] << ", " << Blocks[j].physics.new_accel[1] << '\n'
-               << "    Velocity (x, y): " << Blocks[j].physics.velocity[0] << ", " << Blocks[j].physics.velocity[1] << '\n'
-               << "    Mass: " << Blocks[j].physics.mass << '\n'
-
-               << "\n Distance: " << pixel_distance << " px \n'"
-               << "\n Distance: " << r << " meters" << '\n';*/
         }
     }
+
     for (auto& block : Blocks) {
         block.physics.velocity[0] += block.physics.new_accel[0] * dt;
 
         block.physics.velocity[1] += block.physics.new_accel[1] * dt;
 
-        block.rendering.rect.x += block.physics.velocity[0] * dt;
+        block.rendering.rect.x += (block.physics.velocity[0] * dt) / MetersPerPixel;
 
-        block.rendering.rect.y += block.physics.velocity[1] * dt;
+        block.rendering.rect.y += (block.physics.velocity[1] * dt) / MetersPerPixel;
     }
 }
 
@@ -106,7 +73,7 @@ std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<
 
     double SimDt = dt;
 
-    double Mass = pow(10, mass);
+    double Mass = mass;
 
     NewInstance = { { {Mass}, {InitialVel[0], InitialVel[1]}, {0, 0} }, {{(float)CreationX - (float)WorldOffset[0], (float)CreationY - (float)WorldOffset[1], 20, 20}} };
 
@@ -163,43 +130,49 @@ std::vector<std::array<double, 2>> Physics::GetNewBlockInstancePath(std::vector<
     return Path;
 }
 
-void Physics::Collision(std::vector<CombinedBlock>& Blocks) {
-    //PROVEN
-	for (size_t i = 0; i < Blocks.size(); i++) {
-		bool erased = false;
-		for (size_t j = i+1; j < Blocks.size(); j++) {
+void Physics::Collision(std::vector<CombinedBlock>& Blocks)
+{
+    for (size_t i = 0; i < Blocks.size(); i++) {
 
-			if (Blocks[i].rendering.rect.x <= Blocks[j].rendering.rect.x + Blocks[j].rendering.rect.w && Blocks[i].rendering.rect.x + Blocks[i].rendering.rect.w >= Blocks[j].rendering.rect.x && Blocks[i].rendering.rect.y <= Blocks[j].rendering.rect.y + Blocks[j].rendering.rect.h && Blocks[i].rendering.rect.y + Blocks[i].rendering.rect.h >= Blocks[j].rendering.rect.y) {
-				Blocks.erase(Blocks.begin() + j);
-				Blocks.erase(Blocks.begin() + i);
+        bool erased = false;
 
-				erased = true;
-				break;
-			}
-		}
+        for (size_t j = i + 1; j < Blocks.size(); j++) {
 
-		if (erased) {
-			i--;
-		}
-	}
+            if (Blocks[i].rendering.rect.x <= Blocks[j].rendering.rect.x + Blocks[j].rendering.rect.w && Blocks[i].rendering.rect.x + Blocks[i].rendering.rect.w >= Blocks[j].rendering.rect.x && Blocks[i].rendering.rect.y <= Blocks[j].rendering.rect.y + Blocks[j].rendering.rect.h && Blocks[i].rendering.rect.y + Blocks[i].rendering.rect.h >= Blocks[j].rendering.rect.y) {
+
+                Blocks.erase(Blocks.begin() + j);
+                Blocks.erase(Blocks.begin() + i);
+
+                erased = true;
+                break;
+            }
+        }
+
+        if (erased) {
+            i--;
+        }
+    }
 }
 
-CombinedBlock Physics::OrbitPlaceCalculation(CombinedBlock* SelectedBlock, std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double GravitationalConstant, double SimulationScale, double MetersPerPixelExpo, double mass, double dt, double WorldOffset[2], double WorldCenter[2]) {
-    //UNPROVEN
+CombinedBlock Physics::OrbitPlaceCalculation(int* SelectedBlock, std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double GravitationalConstant, double SimulationScale, double MetersPerPixelExpo, double mass, double dt, double WorldOffset[2], double WorldCenter[2]) {
+    //UNPROVEN (PROVEN TO PRODUCE STABLE PERFECT (ISH) ORBIT, AND TAKE INTO ACCOUNT SELECTEDBLOCK VEL)
+    // FIND ACCEL OF OBJ A TO ALL OTHER OBJS , OBJ B TO ALL OTHER OBJS, AND FIND DIFF. THEN SUB FROM OBJ A <-> OBJ B.
 
-    CombinedBlock temp{ {pow(10, mass), {0, 0}, {0, 0} }, { {WorldCenter[0] + ((mouse.x - WorldCenter[0]) / SimulationScale), WorldCenter[1] + ((mouse.y - WorldCenter[1]) / SimulationScale), 20, 20}}, {false}};
+    CombinedBlock temp{ {mass, {0, 0}, {0, 0} }, { {WorldCenter[0] + SimulationScale * (mouse.x - WorldCenter[0]) - WorldOffset[0], WorldCenter[1] + SimulationScale * (mouse.y - WorldCenter[1]) - WorldOffset[1], 20, 20}, { -1 }, {} }, { false } };
 
-    
-    double dx = temp.rendering.rect.x - SelectedBlock->rendering.rect.x;
-    double dy = temp.rendering.rect.y - SelectedBlock->rendering.rect.y;
 
-    double pixel_dist = std::sqrt(dx * dx + dy * dy);
+    CombinedBlock SelectedBlockInUse = Blocks[*SelectedBlock];
+
+    double dx = temp.rendering.rect.x - SelectedBlockInUse.rendering.rect.x;
+    double dy = temp.rendering.rect.y - SelectedBlockInUse.rendering.rect.y;
 
     double MetersPerPixel = pow(10, MetersPerPixelExpo);
 
+    double pixel_dist = std::sqrt(dx * dx + dy * dy);
+
     double r = (pixel_dist * MetersPerPixel);
 
-    double acceleration = (GravitationalConstant * SelectedBlock->physics.mass) / (r * r);
+    double acceleration = ((GravitationalConstant * SelectedBlockInUse.physics.mass) / (r * r));
 
     double vel = sqrt(acceleration * r);
 
@@ -210,8 +183,9 @@ CombinedBlock Physics::OrbitPlaceCalculation(CombinedBlock* SelectedBlock, std::
     double x_vel = cos(perpindicularAngle) * vel;
     double y_vel = sin(perpindicularAngle) * vel;
 
-    temp.physics.velocity[0] = x_vel;
-    temp.physics.velocity[1] = y_vel;
+    temp.physics.velocity[0] = x_vel + SelectedBlockInUse.physics.velocity[0];
+    temp.physics.velocity[1] = y_vel + SelectedBlockInUse.physics.velocity[1];
+
 
     return temp;
 }
