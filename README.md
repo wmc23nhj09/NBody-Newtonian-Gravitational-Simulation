@@ -19,7 +19,7 @@
 * Circles around each object to see them at a distance
 
 ## Trail Lines
-![Trail lines in use](media/'Show%20trajectory%20line.gif')
+![Trail lines in use](media/Show%20trajectory%20line.gif)
 
 # Future Features
 * Energy Conservation
