@@ -23,6 +23,7 @@ struct RenderingState {
 
 struct InteractionState {
 	bool clicked{ false };
+	bool hoveringOver{ false };
 };
 
 struct CombinedBlock {
@@ -34,6 +35,6 @@ struct CombinedBlock {
 class BlocksManager {
 public:
 	void CreateNewPhysicsObject(std::vector<CombinedBlock>& Blocks, SDL_FRect& mouse, double SimulationScale, double WorldCenter[2], double WorldOffset[2], double InitialVel[2], double mass, double rho);
-	void GetHeldState(std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double WorldOffset[2], double WorldCenter[2], double SimulationScale);
+	void GetHeldState(std::vector<CombinedBlock>& Blocks, SDL_FRect mouse, double WorldOffset[2], double WorldCenter[2], double SimulationScale, bool ClickCheck);
 	void SetTrails(std::vector<CombinedBlock>& Blocks, double SimTime, int* SelectedBlock);
 };

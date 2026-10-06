@@ -45,6 +45,7 @@ private:
 	bool CreationDragging;
 	bool ShowInteractionLines;
 	bool ShowAllOrbitLines;
+	bool ShowAllBlockByCircle;
 	bool BlockPropertyCreationMenu;
 	bool SimulationSettings;
 	bool SimPlay;

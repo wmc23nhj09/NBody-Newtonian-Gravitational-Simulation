@@ -40,6 +40,7 @@ Game::Game() :
 	CreationDragging(false),
 	ShowInteractionLines(false),
 	ShowAllOrbitLines(false),
+	ShowAllBlockByCircle(false),
 	BlockPropertyCreationMenu(false),
 	SimulationSettings(false),
 	SimPlay(true),
@@ -49,7 +50,7 @@ Game::Game() :
 	Path{},
 	CreationX(),
 	CreationY(),
-	InitialVel{0, 0}
+	InitialVel{ 0, 0 }
 {
 }
 
@@ -87,18 +88,49 @@ void Game::run() {
 				running = false;
 			}
 
-			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_Q) {
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_C) {
 				Creation = !Creation;
 				OrbitPlace = false;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_D) {
+
+				if ((e.key.mod & SDL_KMOD_SHIFT) != 0) {
+					Blocks.clear();
+					SelectedBlock = nullptr;
+				}
+				//else{}
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_O) {
+				OrbitPlace = !OrbitPlace;
+				Creation = false;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_J) {
+				ShowAllBlockByCircle = !ShowAllBlockByCircle;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_K) {
+				ShowAllOrbitLines = !ShowAllOrbitLines;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_L) {
+				ShowInteractionLines = !ShowInteractionLines;
 			}
 
 			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_B) {
 				BlockPropertyCreationMenu = !BlockPropertyCreationMenu;
 			}
 
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_S) {
+				SimulationSettings = !SimulationSettings;
+			}
+
 			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_SPACE) {
 				SimPlay = !SimPlay;
 			}
+
 
 			if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 
@@ -131,7 +163,7 @@ void Game::run() {
 
 					}
 					else {
-						blocksManager.GetHeldState(Blocks, mouse, WorldOffset, WorldCenter, SimulationScale);
+						blocksManager.GetHeldState(Blocks, mouse, WorldOffset, WorldCenter, SimulationScale, true);
 						for (auto& b : Blocks){
 							if (b.interaction.clicked) {
 								SelectedBlock = &b.rendering.id;
@@ -153,15 +185,15 @@ void Game::run() {
 
 				if (y < 0) {
 
-					if (SimulationScale + 1 <= 1e6) {
-						SimulationScale += 1;
+					if (SimulationScale + 0.1 <= 1e6) {
+						SimulationScale += 0.1;
 					}
 
 				}
 				else if (y > 0) {
 
-					if (SimulationScale - 1 >= 1) {
-						SimulationScale -= 1;
+					if (SimulationScale - .1 >= 1) {
+						SimulationScale -= .1;
 					}
 
 				}
@@ -216,19 +248,6 @@ void Game::run() {
 				}
 			}
 
-			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_R) {
-				Blocks.clear();
-				SelectedBlock = nullptr;
-			}
-
-			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_O) {
-				OrbitPlace = !OrbitPlace;
-				Creation = false;
-			}
-
-			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_A) {
-				ShowAllOrbitLines = !ShowAllOrbitLines;
-			}
 
 		}
 
@@ -258,7 +277,7 @@ void Game::run() {
 			Path = physics.GetNewBlockInstancePath(Blocks, GravitationalConstant, SimulationScale, InitialVel, CreationBlockMassTotal, CreationX, CreationY, rect, WorldCenter, WorldOffset, MetersPerPixel, NewInstance, dt);
 		}
 
-		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldCenter, WorldOffset, ShowInteractionLines, ShowAllOrbitLines, Path, BlockPropertyCreationMenu, Creation, OrbitPlace, SelectedBlock, SimTime);
+		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldCenter, WorldOffset, ShowInteractionLines, ShowAllOrbitLines, Path, BlockPropertyCreationMenu, Creation, OrbitPlace, SelectedBlock, SimTime, ShowAllBlockByCircle);
 
 		if (SimPlay) {
 			physics.ApplyGravity(Blocks, GravitationalConstant, dt, SimulationScale, MetersPerPixel);

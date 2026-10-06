@@ -168,6 +168,56 @@ CombinedBlock Physics::OrbitPlaceCalculation(int* SelectedBlock, std::vector<Com
 
     double MetersPerPixel = pow(10, MetersPerPixelExpo);
 
+    double VelOffsetSelectedBlock[2] = { 0,0 };
+    double VelOffsetTempBlock[2] = { 0, 0 };
+
+    for (int i = 0; i < Blocks.size(); i++) {
+        if (*SelectedBlock == i) {
+            continue;
+        }
+
+        // Selected Block Section
+
+        double dxSB = SelectedBlockInUse.rendering.rect.x - Blocks[i].rendering.rect.x;
+        double dySB = SelectedBlockInUse.rendering.rect.y - Blocks[i].rendering.rect.y;
+
+        double pix_dist_SB = std::sqrt(dxSB * dxSB + dySB * dySB);
+
+        if (pix_dist_SB < 0.0001) {
+            continue;
+        }
+
+        double r_SB = pix_dist_SB * MetersPerPixel;
+
+        double force_SB = ((GravitationalConstant * (Blocks[i].physics.mass * SelectedBlockInUse.physics.mass))) / (r_SB * r_SB);
+
+        double accel_SB = force_SB / SelectedBlockInUse.physics.mass;
+
+        VelOffsetSelectedBlock[0] += (accel_SB * (dxSB / pix_dist_SB)) * dt;
+        VelOffsetSelectedBlock[1] += (accel_SB * (dySB / pix_dist_SB)) * dt;
+
+        // Temp Block Section
+
+        double dxTB = temp.rendering.rect.x - Blocks[i].rendering.rect.x;
+        double dyTB = temp.rendering.rect.y - Blocks[i].rendering.rect.y;
+
+        double pix_dist_TB = std::sqrt(dxTB * dxTB + dyTB * dyTB);
+
+        if (pix_dist_TB < 0.0001) {
+            continue;
+        }
+        double r_TB = (pix_dist_TB * MetersPerPixel);
+
+        double force_TB = ((GravitationalConstant * (Blocks[i].physics.mass * temp.physics.mass)) ) / (r_TB * r_TB);
+        double accel_TB = force_TB / temp.physics.mass;
+
+        VelOffsetTempBlock[0] += (accel_TB * (dxTB /  pix_dist_TB)) * dt;
+        VelOffsetTempBlock[1] += (accel_TB * (dyTB / pix_dist_TB)) * dt;
+    }
+
+    double VelOffsetTotal[2] = {(VelOffsetSelectedBlock[0] - VelOffsetTempBlock[0]), (VelOffsetSelectedBlock[1] - VelOffsetTempBlock[1])};
+
+
     double pixel_dist = std::sqrt(dx * dx + dy * dy);
 
     double r = (pixel_dist * MetersPerPixel);
@@ -183,8 +233,9 @@ CombinedBlock Physics::OrbitPlaceCalculation(int* SelectedBlock, std::vector<Com
     double x_vel = cos(perpindicularAngle) * vel;
     double y_vel = sin(perpindicularAngle) * vel;
 
-    temp.physics.velocity[0] = x_vel + SelectedBlockInUse.physics.velocity[0];
-    temp.physics.velocity[1] = y_vel + SelectedBlockInUse.physics.velocity[1];
+
+    temp.physics.velocity[0] = x_vel + SelectedBlockInUse.physics.velocity[0] + VelOffsetTotal[0];
+    temp.physics.velocity[1] = y_vel + SelectedBlockInUse.physics.velocity[1] + VelOffsetTotal[1];
 
 
     return temp;

@@ -2,6 +2,7 @@
 
 #include "blocks.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_image.h>
 #include <vector>
 #include <array>
 
@@ -12,5 +13,5 @@ public:
 
 	Renderer(SDL_Renderer* renderer);
 
-	void Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldSize[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines, std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime);
+	void Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldSize[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines, std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime, bool hoveringOver);
 };

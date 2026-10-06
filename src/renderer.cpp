@@ -8,14 +8,35 @@ Renderer::Renderer(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 };
 
-void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines,std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime) {
+void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines,std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime, bool ShowAllBlockLocationsByCircle) {
+
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	SDL_RenderClear(renderer);
 
+
+
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 
+
 	for (int i = 0; i < Blocks.size(); i++) {
+
+		if (Blocks[i].interaction.hoveringOver || ShowAllBlockLocationsByCircle) {
+
+			int segments = 32;
+
+			std::vector<SDL_FPoint> points(segments + 1);
+
+			for (int angleIT = 0; angleIT <= segments; ++angleIT) {
+				float angle = angleIT * 2.0f * SDL_PI_F / segments;
+
+				points[angleIT].x = (WorldCenter[0] + ((((Blocks[i].rendering.rect.x + Blocks[i].rendering.rect.w/2 + (Blocks[i].rendering.rect.w * SimulationScale * cosf(angle))) - WorldCenter[0]) / SimulationScale))) + (WorldOffset[0]/SimulationScale);
+				points[angleIT].y = (WorldCenter[1] + ((((Blocks[i].rendering.rect.y + Blocks[i].rendering.rect.h / 2 + (Blocks[i].rendering.rect.h * SimulationScale * sinf(angle))) - WorldCenter[1]) / SimulationScale))) + (WorldOffset[1] / SimulationScale);
+			}
+
+			// Draws all lines sequentially in a single hardware call
+			SDL_RenderLines(renderer, points.data(), (int)points.size());
+		}
 
 		if (SelectedBlock != nullptr || ShowAllOrbitLines) {
 
@@ -84,7 +105,7 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 
 	double WorldSize[2] = {WorldCenter[0] * 2, WorldCenter[1] * 2};
 
-	SDL_FRect corner_cube_iloveyou{ WorldSize[0] * 0.63, (float)0.6639 * WorldSize[1], WorldSize[0] - WorldSize[0] * 0.63, WorldSize[1] - (float)0.6639 * (float)WorldSize[1] };
+	SDL_FRect corner_cube_iloveyou{ WorldSize[0] * 0.8, (float)0.8 * WorldSize[1], WorldSize[0] - WorldSize[0] * 0.8, WorldSize[1] - (float)0.8 * (float)WorldSize[1] };
 	if (CreationTable) {
 		
 		SDL_FRect temp = { 120, (float)0.6639 * (float)WorldSize[1], WorldSize[0] * 0.63, (float)0.6639 * (float)WorldSize[1] };
