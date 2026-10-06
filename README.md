@@ -34,5 +34,4 @@
 # Known Limitations
 * Cannot delete objects individiually
 * Same block size regardless of mass
-* Current scale has users creating scenearios at real world scale, cause weird behavior (Scaling and time scale issues) 
 * Time scale only goes from 0x and 1x
