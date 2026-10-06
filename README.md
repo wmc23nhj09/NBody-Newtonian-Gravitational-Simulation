@@ -8,7 +8,7 @@
 ![Trail lines in use](media/Show%20trajectory%20line.gif) 
 ![Orbit Lines](media/Show%20Orbit%Creator.gif)
 ![Show Block Loc](media/Show%20Block%20Loc%20Via%20Circle.gif) 
-![Show Interaction Lines](media/Show%20interaction%20line)
+![Show Interaction Lines](media/Show%20interaction%20line.gif)
 
 # Features
 * Gravity
