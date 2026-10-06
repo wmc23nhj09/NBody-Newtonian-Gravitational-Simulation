@@ -18,6 +18,9 @@
 * Trail lines of 1 chosen object or all objects in the simulation
 * Circles around each object to see them at a distance
 
+## Trail Lines
+![Trail lines in use](media/'Show trajectory line.gif')
+
 # Future Features
 * Energy Conservation
 * Angular Momentum
