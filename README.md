@@ -12,9 +12,10 @@
 * Block Property Changing~
 * Scalable size
 * Pre-spawning trajectory path
-* Automatic orbit creator~
-* Time Control
+* Automatic orbit creator
+* Time Control (very loose) 
 * Interchangeable pixel to meter ratio
+* Trail lines of 1 chosen object or all objects in the simulation
 
 # Future Features
 * Energy Conservation
@@ -25,4 +26,5 @@
 # Known Limitations
 * Cannot delete objects individiually
 * Same block size regardless of mass
-* Orbit Creator only takes in to account itself, and one selected object, and does not take into account the movement of the selected object.
+* Current scale has users creating scenearios at real world scale, cause weird behavior (Scaling and time scale issues) 
+* Time scale only goes from 0x and 1x
