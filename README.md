@@ -3,6 +3,8 @@
 
 # Overview
 * This program was coded in C++, with SDL3 used as the visual help.
+![Trail lines in use](media/Show%20trajectory%20line.gif) ![Orbit Lines](media/Show%20Orbit%Creator.gif)
+![Show Block Loc](media/Show%20Block%20Loc%20Via%20Circle.gif) ![Show Interaction Lines](media/Show%20interaction%20line)
 
 # Features
 * Gravity
@@ -18,8 +20,6 @@
 * Trail lines of 1 chosen object or all objects in the simulation
 * Circles around each object to see them at a distance
 
-## Trail Lines
-![Trail lines in use](media/Show%20trajectory%20line.gif)
 
 # Future Features
 * Energy Conservation
