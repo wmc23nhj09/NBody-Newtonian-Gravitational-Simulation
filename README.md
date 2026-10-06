@@ -16,6 +16,7 @@
 * Time Control (very loose) 
 * Interchangeable pixel to meter ratio
 * Trail lines of 1 chosen object or all objects in the simulation
+* Circles around each object to see them at a distance
 
 # Future Features
 * Energy Conservation
