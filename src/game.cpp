@@ -43,8 +43,10 @@ Game::Game() :
 	ShowAllBlockByCircle(false),
 	BlockPropertyCreationMenu(false),
 	SimulationSettings(false),
+	HelpMenu(false),
 	SimPlay(true),
 	SimTime{},
+	GridVal{},
 	OrbitPlace(false),
 	Creation(false),
 	Path{},
@@ -55,7 +57,7 @@ Game::Game() :
 }
 
 void Game::run() {
-
+	bool DrawGrid = false;
 	ImGui::CreateContext();
 	ImGui_ImplSDL3_InitForSDLRenderer(window.window, renderer.renderer);
 	ImGui_ImplSDLRenderer3_Init(renderer.renderer);
@@ -131,6 +133,14 @@ void Game::run() {
 				SimPlay = !SimPlay;
 			}
 
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_G) {
+				DrawGrid = !DrawGrid;
+			}
+
+			if (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_H) {
+				HelpMenu = !HelpMenu;
+			}
+
 
 			if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 
@@ -185,15 +195,15 @@ void Game::run() {
 
 				if (y < 0) {
 
-					if (SimulationScale + 0.1 <= 1e6) {
-						SimulationScale += 0.1;
+					if (SimulationScale + 1 <= 1e6) {
+						SimulationScale += 1;
 					}
 
 				}
 				else if (y > 0) {
 
-					if (SimulationScale - .1 >= 1) {
-						SimulationScale -= .1;
+					if (SimulationScale - 1 >= 1) {
+						SimulationScale -= 1;
 					}
 
 				}
@@ -277,7 +287,15 @@ void Game::run() {
 			Path = physics.GetNewBlockInstancePath(Blocks, GravitationalConstant, SimulationScale, InitialVel, CreationBlockMassTotal, CreationX, CreationY, rect, WorldCenter, WorldOffset, MetersPerPixel, NewInstance, dt);
 		}
 
-		renderer.Draw(window.renderer, Blocks, SimulationScale, WorldCenter, WorldOffset, ShowInteractionLines, ShowAllOrbitLines, Path, BlockPropertyCreationMenu, Creation, OrbitPlace, SelectedBlock, SimTime, ShowAllBlockByCircle);
+
+		renderer.Draw(window.renderer, Blocks, SimulationScale, MetersPerPixel, WorldCenter, WorldOffset, ShowInteractionLines, ShowAllOrbitLines, Path, BlockPropertyCreationMenu, SelectedBlock, SimTime, ShowAllBlockByCircle);
+		
+		if (DrawGrid) {
+			renderer.DrawGrid(WorldSize, WorldOffset, GridVal, pow(10, MetersPerPixel), SimulationScale);
+		}
+
+		renderer.DrawStateCube(Creation, OrbitPlace, WorldSize);
+		ui.DrawUI(window.renderer, window_flags, BlockPropertyCreationMenu, SimulationSettings, HelpMenu, window.WindowWidth, window.WindowHeight, CreationBlockMass, CreationBlockMassCoefficient, (float&)rho, MetersPerPixel, GridVal);
 
 		if (SimPlay) {
 			physics.ApplyGravity(Blocks, GravitationalConstant, dt, SimulationScale, MetersPerPixel);
@@ -330,8 +348,6 @@ void Game::run() {
 		else if (SelectedBlock != nullptr) {
 			blocksManager.SetTrails(Blocks, SimTime, SelectedBlock);
 		}
-
-		ui.DrawUI(window.renderer, window_flags, BlockPropertyCreationMenu, SimulationSettings, window.WindowWidth, window.WindowHeight, CreationBlockMass, CreationBlockMassCoefficient,(float&)rho, MetersPerPixel);
 		
 		CreationBlockMassTotal = CreationBlockMassCoefficient * pow(10, CreationBlockMass);
 

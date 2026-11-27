@@ -48,8 +48,10 @@ private:
 	bool ShowAllBlockByCircle;
 	bool BlockPropertyCreationMenu;
 	bool SimulationSettings;
+	bool HelpMenu;
 	bool SimPlay;
 	double SimTime;
+	double GridVal;
 	bool OrbitPlace;
 	bool Creation;
 	std::vector<std::array<double, 2>> Path;

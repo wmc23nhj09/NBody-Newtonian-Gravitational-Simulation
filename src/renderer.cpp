@@ -8,11 +8,14 @@ Renderer::Renderer(SDL_Renderer* renderer) {
 	this->renderer = renderer;
 };
 
-void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines,std::vector<std::array<double, 2>> Path, bool CreationTable, bool Creation, bool OrbitPlace, int* SelectedBlock, double SimTime, bool ShowAllBlockLocationsByCircle) {
+void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, double SimulationScale, double MetersPerPixel, double WorldCenter[2], double WorldOffset[2], bool ShowInteractionLines, bool ShowAllOrbitLines, std::vector<std::array<double, 2>> Path, bool CreationTable, int* SelectedBlock, double SimTime, bool ShowAllBlockLocationsByCircle) {
 
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	SDL_RenderClear(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 255, 200, 200, 0);
+	double WorldSize[2] = { WorldCenter[0] * 2, WorldCenter[1] * 2 };
 
 
 
@@ -30,7 +33,7 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 			for (int angleIT = 0; angleIT <= segments; ++angleIT) {
 				float angle = angleIT * 2.0f * SDL_PI_F / segments;
 
-				points[angleIT].x = (WorldCenter[0] + ((((Blocks[i].rendering.rect.x + Blocks[i].rendering.rect.w/2 + (Blocks[i].rendering.rect.w * SimulationScale * cosf(angle))) - WorldCenter[0]) / SimulationScale))) + (WorldOffset[0]/SimulationScale);
+				points[angleIT].x = (WorldCenter[0] + ((((Blocks[i].rendering.rect.x + Blocks[i].rendering.rect.w / 2 + (Blocks[i].rendering.rect.w * SimulationScale * cosf(angle))) - WorldCenter[0]) / SimulationScale))) + (WorldOffset[0] / SimulationScale);
 				points[angleIT].y = (WorldCenter[1] + ((((Blocks[i].rendering.rect.y + Blocks[i].rendering.rect.h / 2 + (Blocks[i].rendering.rect.h * SimulationScale * sinf(angle))) - WorldCenter[1]) / SimulationScale))) + (WorldOffset[1] / SimulationScale);
 			}
 
@@ -80,7 +83,7 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 				}
 			}
 
-			SDL_FRect Rect = {RenderingX + (WorldOffset[0]/SimulationScale), RenderingY + (WorldOffset[1]/SimulationScale), RenderingWidth, RenderingHeight};
+			SDL_FRect Rect = { RenderingX + (WorldOffset[0] / SimulationScale), RenderingY + (WorldOffset[1] / SimulationScale), RenderingWidth, RenderingHeight };
 
 			SDL_RenderFillRect(renderer, &Rect);
 
@@ -93,7 +96,7 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 
 	for (size_t j = 1; j < Path.size(); ++j)
 	{
-		float x1 = (WorldCenter[0] + ((Path[j - 1][0] - WorldCenter[0]) / SimulationScale)) + (WorldOffset[0]/SimulationScale);
+		float x1 = (WorldCenter[0] + ((Path[j - 1][0] - WorldCenter[0]) / SimulationScale)) + (WorldOffset[0] / SimulationScale);
 		float y1 = (WorldCenter[1] + ((Path[j - 1][1] - WorldCenter[1]) / SimulationScale)) + (WorldOffset[1] / SimulationScale);
 
 		float x2 = (WorldCenter[0] + ((Path[j][0] - WorldCenter[0]) / SimulationScale)) + (WorldOffset[0] / SimulationScale);
@@ -101,11 +104,6 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 
 		SDL_RenderLine(renderer, x1, y1, x2, y2);
 	}
-
-
-	double WorldSize[2] = {WorldCenter[0] * 2, WorldCenter[1] * 2};
-
-	SDL_FRect corner_cube_iloveyou{ WorldSize[0] * 0.8, (float)0.8 * WorldSize[1], WorldSize[0] - WorldSize[0] * 0.8, WorldSize[1] - (float)0.8 * (float)WorldSize[1] };
 	if (CreationTable) {
 		
 		SDL_FRect temp = { 120, (float)0.6639 * (float)WorldSize[1], WorldSize[0] * 0.63, (float)0.6639 * (float)WorldSize[1] };
@@ -113,6 +111,39 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 		SDL_RenderFillRect(renderer, &temp);
 	}
 
+}
+
+void Renderer::DrawGrid(double WorldSize[2], double WorldOffset[2], double& GridVal, double MetersPerPixel, double SimulationScale) {
+	SDL_SetRenderDrawColor(renderer, 255, 225, 225, 0);
+	constexpr int GridSize = 50;
+
+	GridVal = GridSize * MetersPerPixel * SimulationScale;
+	double StartX = fmod(WorldOffset[0], GridSize);
+	double StartY = fmod(WorldOffset[1], GridSize);
+
+	if (StartX < 0) StartX += GridSize;
+	if (StartY < 0) StartY += GridSize;
+
+	for (int i = -1; i < WorldSize[0] / GridSize + 2; i++)
+	{
+		for (int j = -1; j < WorldSize[1] / GridSize + 2; j++)
+		{
+			SDL_FRect rect =
+			{
+				(float)(i * GridSize + StartX),
+				(float)(j * GridSize + StartY),
+				(float)GridSize,
+				(float)GridSize
+			};
+
+			SDL_RenderRect(renderer, &rect);
+		}
+	}
+
+}
+
+void Renderer::DrawStateCube(bool Creation, bool OrbitPlace, double WorldSize[2]) {
+	SDL_FRect corner_cube_iloveyou{ WorldSize[0] * 0.8, (float)0.8 * WorldSize[1], WorldSize[0] - WorldSize[0] * 0.8, WorldSize[1] - (float)0.8 * (float)WorldSize[1] };
 
 	if (Creation) {
 		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
@@ -126,5 +157,4 @@ void Renderer::Draw(SDL_Renderer* renderer, std::vector<CombinedBlock>& Blocks, 
 
 
 	SDL_RenderFillRect(renderer, &corner_cube_iloveyou);
-
 }

@@ -16,7 +16,7 @@ void UI::SetFlags(ImGuiWindowFlags& window_flags) {
 	window_flags |= ImGuiSliderFlags_NoInput;		  // Stops Tab / Ctrl+Click abuse on sliders
 };
 
-void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, float WINWIDTH, float WINHEIGHT, double& mass, double& massCoefficient,float& rho, double& MetersPerPixel) {
+void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& BlockPropertyCreationMenu, bool& SimulationSettings, bool& HelpMenu, float WINWIDTH, float WINHEIGHT, double& mass, double& massCoefficient, float& rho, double& MetersPerPixel, double GridVal) {
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
@@ -39,7 +39,7 @@ void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& Bl
 		ImGui::SetCursorPos(ImVec2(120, 0.67f * WINHEIGHT));
 		ImGui::PushItemWidth(0.66f * WINWIDTH);
 		ImGui::SliderScalar("Mass Coefficient", ImGuiDataType_Double, &massCoefficient, &minCoefficient, &maxCoefficient, " %.2f");
-		
+
 
 		double minExponent = 1;
 		double maxExponent = 30;
@@ -63,6 +63,46 @@ void UI::DrawUI(SDL_Renderer* renderer, ImGuiWindowFlags& window_flags, bool& Bl
 		ImGui::PushItemWidth(0.15 * WINWIDTH);
 		ImGui::SliderScalar("MetersPerPixel", ImGuiDataType_Double, &MetersPerPixel, &minVal, &maxVal, "10^%.0f M/px");
 	}
+
+	ImGui::SetCursorPos(ImVec2(0, 0));
+
+	if (ImGui::Button(" Help Menu ", ImVec2(120, WINHEIGHT - .6639 * WINHEIGHT))) {
+		HelpMenu = !HelpMenu;
+	};
+
+	if (HelpMenu) {
+		ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_Always);
+
+		ImGui::Begin("Controls", &HelpMenu,
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoCollapse);
+
+		ImGui::Text("Controls");
+		ImGui::Separator();
+
+		ImGui::Text("Create an Object - c");
+		ImGui::Text("Destroy all Objects - shift + d");
+		ImGui::Text("Create an orbit around a selected Object - o");
+		ImGui::Text("Pause Sim - Spacebar");
+		ImGui::Text("Block Creation Menu- b");
+		ImGui::Text("Settings Menu - s");
+		ImGui::Text("Show All Blocks Via Circle - j");
+		ImGui::Text("Show All Trajectories - k");
+		ImGui::Text("Show All Lines of Interaction - l");
+		ImGui::Text("Help Menu - h");
+		ImGui::Text("Grid Lines - g");
+
+		ImGui::End();
+	}
+
+	ImGui::SetCursorScreenPos(ImVec2(800, 0));
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	std::string text = "1 grid block = " + std::to_string(GridVal) + " Meters";
+	ImGui::Text(text.c_str());
+	ImGui::PopStyleColor();
 
 	ImGui::End();
 
